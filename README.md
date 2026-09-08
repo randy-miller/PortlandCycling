@@ -26,3 +26,4 @@ This repository has a strict no-LLM policy.
 * Do not submit LLM-generated code in PRs
 * Do not use LLMs to submit issues
 * If you didn't write it, I don't want to read it
+* Just do it yourself, it isn't difficult
