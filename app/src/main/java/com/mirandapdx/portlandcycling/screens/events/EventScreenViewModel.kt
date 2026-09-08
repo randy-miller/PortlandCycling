@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -49,15 +50,12 @@ class EventScreenViewModel(var events: StateFlow<List<Event>>,
     }
 
     // adds or removes the selected event from the list of saved events
-    val toggleSave = { event: Event ->
-        savedEvents.update {
-            savedEvents.value.let {
-                it.toMutableList().apply {
-                    if (contains(event)) remove(event) else add(event)
-                }
-            }
+    val toggleSave: (Event) -> Unit = { event: Event ->
+        savedEvents.value.let {
+            SavedEventRepository.get().update(it.toMutableList().apply {
+                if (contains(event)) remove(event) else add(event)
+            })
         }
-        SavedEventRepository.update(savedEvents.value)
     }
 
     val dateChanged = { newDates: Pair<LocalDate?, LocalDate?> ->

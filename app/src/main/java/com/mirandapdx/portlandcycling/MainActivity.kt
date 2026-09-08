@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    val savedEventRepository = SavedEventRepository()
+    val savedEventRepository = SavedEventRepository.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
         val events = Services.eventFlow
         lifecycleScope.launch(Dispatchers.IO) {
             // set up saved event database
-            SavedEventRepository.setDatabase(
+            savedEventRepository.setDatabase(
                 Room.databaseBuilder<AppDatabase>(applicationContext, "pdx-event-db")
                     .setDriver(AndroidSQLiteDriver())
                     .build())
