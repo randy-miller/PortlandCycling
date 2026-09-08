@@ -38,6 +38,7 @@ interface EventDao {
 }
 
 class SavedEventRepository {
+    private constructor()
     val savedEvents: MutableStateFlow<List<Event>> = MutableStateFlow(listOf())
     lateinit var db: AppDatabase
 
