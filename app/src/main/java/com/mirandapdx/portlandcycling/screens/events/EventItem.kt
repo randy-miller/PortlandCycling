@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.mirandapdx.portlandcycling.data.Event
 import kotlinx.coroutines.flow.MutableStateFlow
 import androidx.compose.runtime.collectAsState
+import com.mirandapdx.portlandcycling.ui.theme.PurpleGrey40
 import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -40,7 +41,7 @@ fun EventItem(event: Event,
         .clip(RoundedCornerShape(12.dp))
         .border(
             width = if(saved) 2.dp else 1.dp,
-            color = if(saved) Color.Yellow else Color.Gray,
+            color = if(saved) Color.Yellow else PurpleGrey40,
             shape = RoundedCornerShape(12.dp))
         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 8.dp) // inner padding for content
         .combinedClickable(

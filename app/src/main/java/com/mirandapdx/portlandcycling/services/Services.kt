@@ -1,7 +1,6 @@
 package com.mirandapdx.portlandcycling.services
 
 import android.util.Log
-import com.mirandapdx.portlandcycling.BuildConfig
 import com.mirandapdx.portlandcycling.CycleApp
 import com.mirandapdx.portlandcycling.data.Event
 import kotlinx.coroutines.CoroutineScope
@@ -39,8 +38,7 @@ object Services {
 
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level =
-            if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        level = HttpLoggingInterceptor.Level.HEADERS
     }
 
     private val okHttpClient = OkHttpClient.Builder()

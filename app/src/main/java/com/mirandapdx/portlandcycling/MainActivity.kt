@@ -27,6 +27,7 @@ import com.mirandapdx.portlandcycling.data.Event
 import com.mirandapdx.portlandcycling.repositories.AppDatabase
 import com.mirandapdx.portlandcycling.repositories.SavedEventRepository
 import com.mirandapdx.portlandcycling.screens.events.EventScreen
+import com.mirandapdx.portlandcycling.screens.info.InfoScreen
 import com.mirandapdx.portlandcycling.screens.saved.SavedEventScreen
 import com.mirandapdx.portlandcycling.services.Services
 import com.mirandapdx.portlandcycling.ui.theme.PortlandCyclingTheme
@@ -100,6 +101,9 @@ fun PortlandCyclingApp(requestedEvents: StateFlow<List<Event>>, savedEvents: Mut
                 AppDestinations.SAVED -> SavedEventScreen(
                     modifier = Modifier.padding(innerPadding),
                     savedEvents = savedEvents)
+
+                AppDestinations.INFO -> InfoScreen(
+                    modifier = Modifier.padding(innerPadding))
             }
         }
     }
@@ -109,6 +113,7 @@ enum class AppDestinations(
     val label: String,
     val icon: Int,
 ) {
-    EVENTS("Events", R.drawable.ic_home),
-    SAVED("Saved", R.drawable.ic_favorite),
+    EVENTS("Events", R.drawable.directions_bike_40px),
+    SAVED("Saved", R.drawable.kid_star_40px),
+    INFO("Info", R.drawable.settings_40px)
 }
