@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -16,22 +17,17 @@ import com.mirandapdx.portlandcycling.ui.theme.PurpleGrey40
 
 @Composable
 fun InfoScreen(modifier: Modifier) {
+    val viewModel = remember { InfoScreenViewModel() }
     Column((modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        InfoBox()
-        {
-            Text("Event info pulled from www.shift2bikes.org public calendar API")
-        }
-        InfoBox()
-        {
-            Text("Long press events to add to Saved screen")
-        }
-        InfoBox()
-        {
-            Text("This app is open source, view the source code or contribute at https://github.com/randy-miller/PortlandCycling")
+        viewModel.infoBoxes.forEach { infoItem ->
+            InfoBox {
+                infoItem.forEach { contents ->
+                    Text(contents)
+                }
+            }
         }
     }
-
 }
 
 @Composable
