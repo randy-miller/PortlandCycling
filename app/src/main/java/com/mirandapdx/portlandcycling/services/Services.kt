@@ -2,7 +2,7 @@ package com.mirandapdx.portlandcycling.services
 
 import android.util.Log
 import com.mirandapdx.portlandcycling.BuildConfig
-import com.mirandapdx.portlandcycling.ShiftApp
+import com.mirandapdx.portlandcycling.CycleApp
 import com.mirandapdx.portlandcycling.data.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +49,7 @@ object Services {
 
     val apiService: ApiService by lazy<ApiService> {
         Retrofit.Builder()
-            .baseUrl(ShiftApp.API_URL)
+            .baseUrl(CycleApp.API_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
