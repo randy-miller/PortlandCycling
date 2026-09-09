@@ -11,6 +11,9 @@ Fetches Portland cycling events from `https://www.shift2bikes.org/api/` and lets
 * save events with long press
 * saved events are highlighted and persisted
 
+**Known Issues**
+* Filter should only apply to Events, should persist between screens
+
 **Future Features**
 * map integration
   * sort by distance
