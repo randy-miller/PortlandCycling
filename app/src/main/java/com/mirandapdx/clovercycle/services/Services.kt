@@ -1,0 +1,130 @@
+package com.mirandapdx.clovercycle.services
+
+import android.util.Log
+import com.mirandapdx.clovercycle.CycleApp
+import com.mirandapdx.clovercycle.data.Event
+import com.mirandapdx.clovercycle.services.appDataScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.datetime.toKotlinLocalDate
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+enum class FetchMode {
+    TODAY
+}
+
+enum class NetworkState {
+    OFFLINE, FETCHING, ONLINE;
+}
+val dataScopeExHandler = CoroutineExceptionHandler{ _, throwable ->
+    Log.e("Services", "Exception: ${throwable.message}:\n" +
+            throwable.printStackTrace().toString())
+    handleException(throwable)
+}
+
+fun handleException(throwable: Throwable) {
+    //
+}
+
+val appDataScope: CoroutineScope
+    get() = CoroutineScope(Dispatchers.IO + dataScopeExHandler)
+object Services {
+
+    var networkState = MutableStateFlow(NetworkState.OFFLINE)
+    // publicly this uses kotlin's LocalDate class for the rest of the class
+    val currentDates =
+        MutableStateFlow<Pair<kotlinx.datetime.LocalDate?, kotlinx.datetime.LocalDate?>>(null to null)
+    val eventFlow = MutableStateFlow<List<Event>>(listOf())
+
+    private var _currentDates: Pair<LocalDate?, LocalDate?> = null to null
+        set(newDates) {
+            field = newDates
+            currentDates.update {
+                val (startDate, endDate) = newDates
+                startDate?.toKotlinLocalDate() to endDate?.toKotlinLocalDate()
+            }
+        }
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.HEADERS
+    }
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .build()
+
+    val apiService: ApiService by lazy<ApiService> {
+        Retrofit.Builder()
+            .baseUrl(CycleApp.API_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
+    }
+
+    val defaultFetch = FetchMode.TODAY
+
+    fun updateDates(newDates: Pair<LocalDate?, LocalDate?>) {
+        appDataScope.launch{
+            eventFlow.update { listOf() } // clear data first
+            eventFlow.update { getEventsForDate(newDates) }
+        }
+    }
+
+    // be default we fetch today's events on app load
+    // in the future this can be controlled via app setting
+    suspend fun defaultFetch(): List<Event> =
+        when (defaultFetch) {
+            FetchMode.TODAY -> getEventsToday()
+        }
+
+    suspend fun getEventsToday(): List<Event> = getEventsForDate(null to null)
+
+    suspend fun getEventsForDate(dateRange: Pair<LocalDate?, LocalDate?>): List<Event> {
+        val (start, end) = dateRange
+        return (start ?: LocalDate.now()).let { startDate -> // startDate default to now()
+            (end ?: startDate).let { endDate -> // emdDate defaults to startDate
+                _currentDates = startDate to endDate
+
+                try {
+                    networkState.update { NetworkState.FETCHING }
+                    apiService.getEvents(
+                        startdate = startDate.apiFormat(),
+                        enddate = endDate.apiFormat()
+                    ).let { response ->
+                        Log.d("ApiService", "got response ${response.isSuccessful}")
+
+                        if (response.isSuccessful) {
+                            networkState.update { NetworkState.ONLINE }
+                            // don't return raw API data, get the Event object
+                            response.body()?.events?.map { it.model }
+                                ?: listOf<Event>().also {
+                                    Log.e("ApiService", "no events for selected range")
+                                }
+                        } else {
+                            networkState.update { NetworkState.OFFLINE }
+                            Log.e("ApiService", "got response ${response.errorBody()}")
+                            listOf()
+                        }
+                    }
+                } catch(e: Exception) {
+                    Log.e("ApiService", "connection error: " + e.message)
+                    networkState.update { NetworkState.OFFLINE }
+                    listOf()
+                }
+            }
+        }
+    }
+}
+
+fun LocalDate.apiFormat(): String = format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

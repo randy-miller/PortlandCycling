@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Portland Cycling"
+rootProject.name = "CloverCycle PDX"
 include(":app")

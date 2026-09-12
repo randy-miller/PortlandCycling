@@ -1,4 +1,4 @@
-### Clover Cycle Android App ###
+### CloverCycle PDX Android App ###
 Play Store Listing TBD (how have I never set up a personal developer account?)
 
 Fetches Portland cycling events from `https://www.shift2bikes.org/api/` and lets you view, sort, and store them.

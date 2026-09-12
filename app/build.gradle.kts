@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.mirandapdx.portlandcycling"
+    namespace = "com.mirandapdx.clovercycle"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.portlandcycling"
+        applicationId = "com.mirandapdx.clovercycle"
         minSdk = 26
         targetSdk = 37
         versionCode = 1
